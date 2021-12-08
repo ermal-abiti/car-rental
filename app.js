@@ -1,20 +1,22 @@
-const mongoose = require('mongoose');
-require("dotenv").config();
-require("./config/database").connect();
-const express = require("express");
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const auth = require('./middleware/auth');
-const jwt_decode = require('jwt-decode');
-const { MongoClient } = require('mongodb');
+import mongoose from 'mongoose';
+import { config } from 'dotenv'
+import { connect } from './config/database.js';
+import express from "express";
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import auth from './middleware/auth.js';
+import jwt_decode from 'jwt-decode';
+import { MongoClient } from 'mongodb';
 
+config();
+connect();
 
 const app = express();
 
 app.use(express.json());
 
 
-const User = require("./model/user");
+import User from "./model/user.js";
 
 
 app.get("/rental-cars", async (req, res) => {
@@ -71,21 +73,22 @@ app.post("/register", async (req, res) => {
 
         // check if user already exist
         // Validate if user exist in our database
-        const oldUser = await User.findOne({ email });
+        const oldUser1 = await User.findOne({ email });
+        const oldUser2 = await User.findOne({ username });
 
-        if (oldUser) {
-        return res.status(409).send("User Already Exist. Please Login");
+        if (oldUser1 || oldUser2) {
+          return res.status(409).send("User Already Exist. Please Login");
         }
 
         //Encrypt user password
-        encryptedPassword = await bcrypt.hash(password, 10);
-
-        // Create user in our database
+        const encryptedPassword = await bcrypt.hash(password, 10);
+        
+        // add user to database
         const user = await User.create({
-        fullName,
-        username: username.toLowerCase(),
-        email: email.toLowerCase(), // sanitize: convert email to lowercase
-        password: encryptedPassword,
+          fullName,
+          username: username.toLowerCase(),
+          email: email.toLowerCase(), 
+          password: encryptedPassword,
         });
 
         // Create token
@@ -146,4 +149,4 @@ app.post("/login", async (req, res) => {
 });
 
 
-module.exports = app;
+export default app;

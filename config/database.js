@@ -1,8 +1,11 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
+import { config } from 'dotenv';
+
+config();
 
 const { MONGO_URI } = process.env;
 
-exports.connect = () => {
+export const connect = () => {
     mongoose
     .connect(MONGO_URI, {
       useNewUrlParser: true

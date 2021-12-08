@@ -1,5 +1,5 @@
-const http = require("http");
-const app = require("./app");
+import http from "http";
+import app from "./app.js";
 const server = http.createServer(app);
 
 const { API_PORT } = process.env;
